@@ -1,16 +1,16 @@
 // pages/api/user.ts
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getSession } from 'next-auth/react'; // Importando getSession
+import { getSession } from 'next-auth/react';
 import { sql } from '@vercel/postgres';
 
 const userHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const session = await getSession({ req }); // Obtendo a sessão
+  const session = await getSession({ req });
 
   if (!session) {
-    return res.status(401).json({ message: 'Não autorizado' }); // Verificando se a sessão existe
+    return res.status(401).json({ message: 'Não autorizado' });
   }
 
-  const userId = session.user.id; // Obtendo o ID do usuário a partir da sessão
+  const userId = session.user.id;
 
   if (req.method === 'GET') {
     try {

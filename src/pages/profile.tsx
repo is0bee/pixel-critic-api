@@ -29,7 +29,7 @@ const ProfilePage = () => {
   }, []);
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: '/' }); // Redireciona para a página inicial após o logout
+    await signOut({ callbackUrl: '/' });
   };
 
   if (loading) return <p>Carregando...</p>;

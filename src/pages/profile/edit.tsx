@@ -15,7 +15,7 @@ const EditProfile = () => {
     const fetchUserData = async () => {
       const session = await getSession();
       if (!session) {
-        router.push('/auth/login'); // Redirecionar para a página de login se não estiver autenticado
+        router.push('/auth/login');
         return;
       }
 
@@ -29,7 +29,7 @@ const EditProfile = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const session = await getSession(); // Verifique a sessão aqui
+    const session = await getSession();
     if (!session) {
       alert('Você precisa estar logado para atualizar o perfil.');
       router.push('/auth/login');
@@ -103,7 +103,6 @@ const EditProfile = () => {
   );
 };
 
-// Estilos
 const styles = {
   container: {
     display: 'flex',

@@ -1,5 +1,5 @@
 import "../App.css";
-import Header from "../components/header/header";
+import Header from "../components/header/log-header";
 import Carrossel from "../components/carousel/carousel";
 import GameList from "../components/cards/getCards";
 

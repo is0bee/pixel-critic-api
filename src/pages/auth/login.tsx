@@ -20,7 +20,7 @@ const Login = () => {
     if (result?.error) {
       alert('Falha no login, verifique suas credenciais.');
     } else {
-      router.push('/profile'); // Redireciona para a página de perfil
+      router.push('/home');
     }
   };
 
