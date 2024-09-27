@@ -34,11 +34,11 @@ export default function AvatarUploadPage() {
         }}
       >
         <input name="file" ref={inputFileRef} type="file" required />
-        <button type="submit">Upload</button>
+        <button type="submit">upload</button>
       </form>
       {blob && (
         <div>
-          Blob url: <a href={blob.url}>{blob.url}</a>
+          url: <a href={blob.url}>{blob.url}</a>
         </div>
       )}
     </>
