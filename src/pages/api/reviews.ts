@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { sql } from '@vercel/postgres';
+import { getSession } from 'next-auth/react';
 
 const reviewsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     switch (req.method) {
@@ -15,14 +16,31 @@ const reviewsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             break;
 
         case 'POST':
-            const { user_id, content, rating, game_id: newGameId } = req.body;
+            const session = await getSession({ req }); // Get the session
+            const user_id = session?.user?.id; // Extract user ID from the session
 
+            if (!user_id) {
+                return res.status(401).json({ message: 'User not authenticated' });
+            }
+
+            const { game, review } = req.body;
+            const { content, rating, game_id: reviewGameId } = review;
+      
             try {
-                const { rows } = await sql`
+                const gameInsert = await sql`
+                    INSERT INTO games (title, description, release_date, platform)
+                    VALUES (${game.title}, ${game.description}, ${game.release_date}, ${game.platform})
+                    ON CONFLICT (id) DO NOTHING
+                    RETURNING id`;
+                
+                const insertedGameId = gameInsert.rows[0]?.id || reviewGameId;
+
+                const reviewInsert = await sql`
                     INSERT INTO Reviews (user_id, content, rating, game_id)
-                    VALUES (${user_id}, ${content}, ${rating}, ${newGameId})
+                    VALUES (${user_id}, ${content}, ${rating}, ${insertedGameId})
                     RETURNING *`;
-                res.status(201).json(rows[0]);
+                
+                res.status(201).json(reviewInsert.rows[0]);
             } catch (error) {
                 res.status(400).json({ message: 'erro ao criar review', error });
             }
