@@ -19,9 +19,8 @@ const EditProfile = () => {
         return;
       }
 
-      // Carregar os dados do usuário
       setBio(session.user?.bio || '');
-      setAvatarUrl(session.user?.avatar || null);
+      setAvatarUrl(session.user?.avatar || 'https://z2gix0vclvtyixr7.public.blob.vercel-storage.com/Profile_avatar_placeholder_large-BCApkdnY21uaTXvHsALhgLtYikreKH.png');
     };
 
     fetchUserData();

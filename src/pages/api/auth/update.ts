@@ -1,15 +1,15 @@
-// pages/api/auth/update-profile.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { sql } from '@vercel/postgres';
-import { getSession } from 'next-auth/react';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]'; // ajuste o caminho conforme necessário
 
 const updateProfile = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Verifique se a requisição é do tipo PUT
   if (req.method !== 'PUT') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  const session = await getSession({ req });
+  const session = await getServerSession(req, res, authOptions);
+  console.log('Session:', session);
 
   if (!session) {
     return res.status(401).json({ message: 'Unauthorized' });

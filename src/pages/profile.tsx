@@ -41,7 +41,11 @@ const ProfilePage = () => {
       <p>Nome: {userData.username}</p>
       <p>Email: {userData.email}</p>
       <p>Bio: {userData.bio}</p>
-      <img src={userData.avatar} alt="Avatar" style={{ width: '100px', height: '100px' }} />
+      <img 
+        src={userData.avatar || 'https://z2gix0vclvtyixr7.public.blob.vercel-storage.com/Profile_avatar_placeholder_large-BCApkdnY21uaTXvHsALhgLtYikreKH.png'} 
+        alt="Avatar" 
+        style={{ width: '100px', height: '100px' }} 
+      />
       <button onClick={() => router.push('/profile/edit')} style={styles.button}>
         Editar Perfil
       </button>

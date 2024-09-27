@@ -1,10 +1,10 @@
-// pages/api/auth/[...nextauth].ts
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { sql } from '@vercel/postgres';
 import bcrypt from 'bcrypt';
 
-export default NextAuth({
+// Defina e exporte authOptions
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credenciais',
@@ -43,4 +43,6 @@ export default NextAuth({
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
+
+export default NextAuth(authOptions);
