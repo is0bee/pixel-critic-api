@@ -1,11 +1,13 @@
-// pages/users/[username].tsx
+'use client';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { getSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 
 const UserPage = () => {
     const router = useRouter();
-    const { username } = router.query;
+    const searchParams = useSearchParams();
+    const username = searchParams.get('username');
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [sessionUser, setSessionUser] = useState(null);
@@ -23,7 +25,7 @@ const UserPage = () => {
     useEffect(() => {
         if (username) {
             const fetchUsers = async () => {
-                const response = await fetch(`http://localhost:3000/api/users`);
+                const response = await fetch(`/api/users`);
 
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -34,7 +36,7 @@ const UserPage = () => {
                 setUser(filteredUser || null);
 
                 if (filteredUser && sessionUser && sessionUser.id !== filteredUser.id) {
-                    const followingResponse = await fetch(`http://localhost:3000/api/followers`, {
+                    const followingResponse = await fetch(`/api/followers`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -44,7 +46,7 @@ const UserPage = () => {
 
                     if (followingResponse.ok) {
                         const followingData = await followingResponse.json();
-                        setIsFollowing(followingData.length > 0); // Set following status
+                        setIsFollowing(followingData.length > 0);
                     }
                 }
                 setLoading(false);
@@ -54,12 +56,15 @@ const UserPage = () => {
                 console.error('Fetch error:', error);
                 setLoading(false);
             });
+        } else {
+            // Handle case where username is not available
+            setLoading(false);
         }
     }, [username, sessionUser]);
 
     const handleFollow = async () => {
-        if (sessionUser) {
-            const response = await fetch(`http://localhost:3000/api/followers`, {
+        if (sessionUser && user) {
+            const response = await fetch(`/api/followers`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,8 +85,8 @@ const UserPage = () => {
     };
 
     const handleUnfollow = async () => {
-        if (sessionUser) {
-            const response = await fetch(`http://localhost:3000/api/followers`, {
+        if (sessionUser && user) {
+            const response = await fetch(`/api/followers`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,7 +98,7 @@ const UserPage = () => {
             });
 
             if (response.ok) {
-                setIsFollowing(false); // Update following status
+                setIsFollowing(false);
                 alert('Você deixou de seguir este usuário.');
             } else {
                 console.error('Erro ao deixar de seguir o usuário');
@@ -102,7 +107,6 @@ const UserPage = () => {
     };
 
     if (loading) return <p>Carregando...</p>;
-
     if (!user) return <p>Usuário não encontrado.</p>;
 
     const isCurrentUser = sessionUser?.id === user?.id;

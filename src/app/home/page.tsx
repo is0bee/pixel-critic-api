@@ -1,5 +1,5 @@
-import "../App.css";
-import Header from "../components/header/log-header";
+'use client';
+import Header from "../components/header/log-header"; // é pra ir pro log-header qnd ta logado
 import Carrossel from "../components/carousel/carousel";
 import GameList from "../components/cards/getCards";
 

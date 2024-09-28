@@ -1,7 +1,7 @@
-// pages/profile.tsx
+'use client';
 import { useEffect, useState } from 'react';
 import { getSession, signOut } from 'next-auth/react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState(null);
@@ -12,7 +12,7 @@ const ProfilePage = () => {
     const fetchUserData = async () => {
       const session = await getSession();
       if (session) {
-        const response = await fetch('/api/get-user');
+        const response = await fetch('/api/users');
         if (response.ok) {
           const data = await response.json();
           setUserData(data);

@@ -13,9 +13,6 @@ function Header() {
 				<li>
 					<a href="auth\signup">Criar conta</a>
 				</li>{" "}
-				<li>
-					<a href="profile">Perfil</a>
-				</li>
 			</ul>
 		</header>
 	);
