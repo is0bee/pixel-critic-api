@@ -16,8 +16,8 @@ const reviewsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             break;
 
         case 'POST':
-            const session = await getSession({ req }); // Get the session
-            const user_id = session?.user?.id; // Extract user ID from the session
+            const session = await getSession({ req });
+            const user_id = session?.user?.id;
 
             if (!user_id) {
                 return res.status(401).json({ message: 'User not authenticated' });
