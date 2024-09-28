@@ -1,26 +1,22 @@
 import "../App.css";
-import Header from "../components/header/header";
-import Carrossel from "../components/carousel/carousel";
-import GameList from "../components/cards/getCards";
 
 function App() {
 	return (
-		<section
-			style={{
-				backgroundColor: "black",
-				display: "flex",
-				flexDirection: "column",
-				alignItems: "center",
-				justifyContent: "center",
-			}}
-		>
-			<Header />
-			<Carrossel />
-			
-			<div style={{ display: "flex", gap: 4 }}>
-				<GameList />
-			</div>
-		</section>
+		<div className="flex flex-col h-full w-auto items-center justify-center">
+			<h1 className="text-3xl font-bold">Bem vindo a pixel-critic-api</h1>
+			<h2 className="text-xl font-medium">Navegue por uma das nossas rotas de api</h2>
+
+			<ul className="mt-5 flex flex-col w-full items-start">
+				<li>/auth/login</li>
+				<li>/auth/signup</li>
+				<li>/avatar/upload</li>
+				<li>/followers</li>
+				<li>/profile/update</li>
+				<li>/reviews</li>
+				<li>/topfour</li>
+				<li>/user</li>
+			</ul>
+		</div>
 	);
 }
 
