@@ -3,7 +3,6 @@ import { sql } from '@vercel/postgres';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]';
 
-// GET Action
 export async function GET(req: Request) {
     const url = new URL(req.url);
     const game_id = url.searchParams.get("game_id");
