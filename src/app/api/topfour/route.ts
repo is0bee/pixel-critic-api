@@ -3,9 +3,9 @@ import { sql } from '@vercel/postgres';
 
 export async function GET(req: Request) {
     const url = new URL(req.url);
-    const user_id = url.searchParams.get("user_id"); // Use .get() to retrieve the parameter
+    const user_id = url.searchParams.get("user_id");
 
-    console.log(`Fetching Topfour for user_id: ${user_id}`); // Log the user_id
+    console.log(`Fetching Topfour for user_id: ${user_id}`);
 
     if (!user_id) {
         return NextResponse.json({ message: 'User ID is required' }, { status: 400 });

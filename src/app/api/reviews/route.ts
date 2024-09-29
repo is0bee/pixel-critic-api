@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'aipapai';
 
 export async function GET(req: Request) {
     const url = new URL(req.url);
@@ -16,20 +17,27 @@ export async function GET(req: Request) {
             SELECT * FROM Reviews WHERE game_id = ${game_id}`;
         return NextResponse.json(rows, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ message: 'Erro ao buscar reviews', error }, { status: 500 });
+        return NextResponse.json({ message: 'Error fetching reviews', error }, { status: 500 });
     }
 }
 
-
 export async function POST(req: Request) {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json({ message: 'User not authenticated' }, { status: 401 });
+    }
+
+    const token = authHeader.split(' ')[1];
+    let user_id;
+
     try {
-        const session = await getServerSession(authOptions); 
-        const user_id = session?.user?.id;
+        const decoded = jwt.verify(token, JWT_SECRET);
+        user_id = decoded.id;
+    } catch (error) {
+        return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+    }
 
-        if (!user_id) {
-            return NextResponse.json({ message: 'User not authenticated' }, { status: 401 });
-        }
-
+    try {
         const { game, review } = await req.json();
         const { content, rating, game_id: reviewGameId } = review;
 
@@ -48,22 +56,36 @@ export async function POST(req: Request) {
 
         return NextResponse.json(reviewInsert.rows[0], { status: 201 });
     } catch (error) {
-        return NextResponse.json({ message: 'Erro ao criar review', error }, { status: 400 });
+        return NextResponse.json({ message: 'Error creating review', error }, { status: 400 });
     }
 }
 
-// DELETE Action
 export async function DELETE(req: Request) {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json({ message: 'User not authenticated' }, { status: 401 });
+    }
+
+    const token = authHeader.split(' ')[1];
+    let user_id;
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        user_id = decoded.id; 
+    } catch (error) {
+        return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+    }
+
     const { reviewId } = await req.json();
 
     try {
         const { rowCount } = await sql`
-            DELETE FROM Reviews WHERE id = ${reviewId}`;
+            DELETE FROM Reviews WHERE id = ${reviewId} AND user_id = ${user_id}`;
         if (rowCount === 0) {
-            return NextResponse.json({ message: 'Review não encontrada' }, { status: 404 });
+            return NextResponse.json({ message: 'Review not found or not authorized to delete' }, { status: 404 });
         }
         return NextResponse.json(null, { status: 204 });
     } catch (error) {
-        return NextResponse.json({ message: 'Erro ao deletar review', error }, { status: 400 });
+        return NextResponse.json({ message: 'Error deleting review', error }, { status: 400 });
     }
 }

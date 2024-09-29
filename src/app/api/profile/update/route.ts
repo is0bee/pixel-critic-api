@@ -1,25 +1,26 @@
-// app/api/profile/update/route.ts
 import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'aipapai';
 
 export async function PUT(request: Request) {
-    const session = await getServerSession(authOptions);
-    console.log('Session:', session);
 
-
-    if (!session) {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { bio, avatar } = await request.json();
-
+    const token = authHeader.split(' ')[1];
     try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        const { bio, avatar } = await request.json();
+
         const result = await sql`
             UPDATE Users
             SET bio = ${bio}, avatar = ${avatar}
-            WHERE email = ${session.user.email}
+            WHERE email = ${decoded.email}
         `;
 
         if (result.rowCount === 0) {
@@ -28,7 +29,7 @@ export async function PUT(request: Request) {
 
         return NextResponse.json({ message: 'Profile updated successfully' }, { status: 200 });
     } catch (error) {
-        console.error('Error updating profile:', error);
-        return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+        console.error('Error verifying token or updating profile:', error);
+        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 }

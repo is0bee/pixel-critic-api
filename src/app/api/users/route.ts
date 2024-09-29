@@ -1,22 +1,29 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
 import { sql } from '@vercel/postgres';
-import { authOptions } from '../auth/[...nextauth]';
+import jwt from 'jsonwebtoken';
 
+const JWT_SECRET = process.env.JWT_SECRET || 'aipapai';
 
 const authenticate = async (req: Request) => {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return null;
     }
-    return session.user;
+
+    const token = authHeader.split(' ')[1];
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        return decoded;
+    } catch (error) {
+        return null;
+    }
 };
 
 export async function GET(req: Request) {
-    // const user = await authenticate(req);
-    // if (!user) {
-    //     return NextResponse.json({ message: 'Usuário não autenticado' }, { status: 401 });
-    // }
+    const user = await authenticate(req);
+    if (!user) {
+        return NextResponse.json({ message: 'Usuário não autenticado' }, { status: 401 });
+    }
 
     try {
         const { rows } = await sql`SELECT * FROM Users`;
@@ -27,10 +34,10 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    // const user = await authenticate(req);
-    // if (!user) {
-    //     return NextResponse.json({ message: 'Usuário não autenticado' }, { status: 401 });
-    // }
+    const user = await authenticate(req);
+    if (!user) {
+        return NextResponse.json({ message: 'Usuário não autenticado' }, { status: 401 });
+    }
 
     const { username, email, bio, avatar, password } = await req.json();
 
@@ -45,12 +52,11 @@ export async function POST(req: Request) {
     }
 }
 
-
 export async function PUT(req: Request) {
-    // const user = await authenticate(req);
-    // if (!user) {
-    //     return NextResponse.json({ message: 'Usuário não autenticado' }, { status: 401 });
-    // }
+    const user = await authenticate(req);
+    if (!user) {
+        return NextResponse.json({ message: 'Usuário não autenticado' }, { status: 401 });
+    }
 
     const { id, updatedUsername, updatedEmail, updatedBio, updatedAvatar } = await req.json();
 
@@ -70,10 +76,10 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-    // const user = await authenticate(req);
-    // if (!user) {
-    //     return NextResponse.json({ message: 'Usuário não autenticado' }, { status: 401 });
-    // }
+    const user = await authenticate(req);
+    if (!user) {
+        return NextResponse.json({ message: 'Usuário não autenticado' }, { status: 401 });
+    }
 
     const { userId } = await req.json();
 

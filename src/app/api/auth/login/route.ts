@@ -1,8 +1,8 @@
 import { sql } from '@vercel/postgres';
-import bcrypt from 'bcryptjs'; // Consider using 'bcrypt' instead of 'bcryptjs' for better performance
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'aipapai'; // Use an environment variable for security
+const JWT_SECRET = process.env.JWT_SECRET || 'aipapai';
 
 export async function POST(req: Request) {
   const { email, password } = await req.json();
