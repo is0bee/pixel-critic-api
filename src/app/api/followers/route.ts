@@ -1,50 +1,47 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { sql } from '@vercel/postgres';
+import { NextResponse } from 'next/server';
 
-const followersHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-    const { userId, followerId } = req.body; // userId é o usuário que está seguindo, followerId é o que está sendo seguido
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
 
-    switch (req.method) {
-        case 'GET':
-            try {
-                const { rows } = await sql`
-                    SELECT * FROM followers WHERE following_id = ${userId}`;
-                res.status(200).json(rows);
-            } catch (error) {
-                res.status(500).json({ message: 'Erro ao procurar seguidores', error });
-            }
-            break;
-
-        case 'POST':
-            try {
-                const { rows } = await sql`
-                    INSERT INTO followers (follower_id, following_id)
-                    VALUES (${followerId}, ${userId})
-                    RETURNING *`;
-                res.status(201).json(rows[0]);
-            } catch (error) {
-                res.status(400).json({ message: 'Erro ao seguir usuário', error });
-            }
-            break;
-
-        case 'DELETE':
-            try {
-                const { rowCount } = await sql`
-                    DELETE FROM followers
-                    WHERE follower_id = ${followerId} AND following_id = ${userId}`;
-                if (rowCount === 0) {
-                    return res.status(404).json({ message: 'Não se seguem mutuamente' });
-                }
-                res.status(204).end();
-            } catch (error) {
-                res.status(400).json({ message: 'Erro ao deixar de seguir', error });
-            }
-            break;
-
-        default:
-            res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
-            res.status(405).end(`Method ${req.method} not allowed`);
+    try {
+        const { rows } = await sql`
+            SELECT * FROM followers WHERE following_id = ${userId}`;
+        return NextResponse.json(rows, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ message: 'Erro ao procurar seguidores', error }, { status: 500 });
     }
-};
+}
 
-export default followersHandler;
+
+export async function POST(request: Request) {
+    const { userId, followerId } = await request.json(); // userId é quem segue, followerId é quem está sendo seguido
+
+    try {
+        const { rows } = await sql`
+            INSERT INTO followers (follower_id, following_id)
+            VALUES (${followerId}, ${userId})
+            RETURNING *`;
+        return NextResponse.json(rows[0], { status: 201 });
+    } catch (error) {
+        return NextResponse.json({ message: 'Erro ao seguir usuário', error }, { status: 400 });
+    }
+}
+
+
+export async function DELETE(request: Request) {
+    const { userId, followerId } = await request.json();
+
+    try {
+        const { rowCount } = await sql`
+            DELETE FROM followers
+            WHERE follower_id = ${followerId} AND following_id = ${userId}`;
+        if (rowCount === 0) {
+            return NextResponse.json({ message: 'Não se seguem mutuamente' }, { status: 404 });
+        }
+        return NextResponse.json(null, { status: 204 });
+    } catch (error) {
+        return NextResponse.json({ message: 'Erro ao deixar de seguir', error }, { status: 400 });
+    }
+}

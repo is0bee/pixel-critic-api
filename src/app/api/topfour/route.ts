@@ -1,53 +1,52 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
 
-const topfourHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-    switch (req.method) {
-        case 'GET':
-            const { user_id } = req.query;
-            try {
-                const { rows } = await sql`
-                    SELECT * FROM Topfour WHERE user_id = ${user_id} ORDER BY position`;
-                res.status(200).json(rows);
-            } catch (error) {
-                res.status(500).json({ message: 'Erro ao buscar top 4 games', error });
-            }
-            break;
+export async function GET(req: Request) {
+    const url = new URL(req.url);
+    const user_id = url.searchParams.get("user_id"); // Use .get() to retrieve the parameter
 
-        case 'POST':
-            const { userId, gameId, position } = req.body;
+    console.log(`Fetching Topfour for user_id: ${user_id}`); // Log the user_id
 
-            try {
-                const { rows } = await sql`
-                    INSERT INTO Topfour (user_id, game_id, position)
-                    VALUES (${userId}, ${gameId}, ${position})
-                    ON CONFLICT (user_id, position) DO UPDATE SET game_id = ${gameId}
-                    RETURNING *`;
-                res.status(201).json(rows[0]);
-            } catch (error) {
-                res.status(400).json({ message: 'Erro ao atualizar top 4 games', error });
-            }
-            break;
-
-        case 'DELETE':
-            const { userIdToDelete, positionToDelete } = req.body;
-
-            try {
-                const { rowCount } = await sql`
-                    DELETE FROM Topfour WHERE user_id = ${userIdToDelete} AND position = ${positionToDelete}`;
-                if (rowCount === 0) {
-                    return res.status(404).json({ message: 'Top game não encontrado' });
-                }
-                res.status(204).end();
-            } catch (error) {
-                res.status(400).json({ message: 'Erro ao deletar top game', error });
-            }
-            break;
-
-        default:
-            res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
-            res.status(405).end(`Method ${req.method} not allowed`);
+    if (!user_id) {
+        return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
     }
-};
 
-export default topfourHandler;
+    try {
+        const { rows } = await sql`
+            SELECT * FROM Topfour WHERE user_id = ${user_id} ORDER BY position`;
+        console.log(`Rows returned: ${JSON.stringify(rows)}`); 
+        return NextResponse.json(rows, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ message: 'Erro ao buscar top 4 games', error }, { status: 500 });
+    }
+}
+
+export async function POST(req: Request) {
+    const { userId, gameId, position } = await req.json();
+
+    try {
+        const { rows } = await sql`
+            INSERT INTO Topfour (user_id, game_id, position)
+            VALUES (${userId}, ${gameId}, ${position})
+            ON CONFLICT (user_id, position) DO UPDATE SET game_id = ${gameId}
+            RETURNING *`;
+        return NextResponse.json(rows[0], { status: 201 });
+    } catch (error) {
+        return NextResponse.json({ message: 'Erro ao atualizar top 4 games', error }, { status: 400 });
+    }
+}
+
+export async function DELETE(req: Request) {
+    const { userIdToDelete, positionToDelete } = await req.json();
+
+    try {
+        const { rowCount } = await sql`
+            DELETE FROM Topfour WHERE user_id = ${userIdToDelete} AND position = ${positionToDelete}`;
+        if (rowCount === 0) {
+            return NextResponse.json({ message: 'Top game não encontrado' }, { status: 404 });
+        }
+        return NextResponse.json(null, { status: 204 });
+    } catch (error) {
+        return NextResponse.json({ message: 'Erro ao deletar top game', error }, { status: 400 });
+    }
+}

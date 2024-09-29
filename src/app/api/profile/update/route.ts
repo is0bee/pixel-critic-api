@@ -2,9 +2,12 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '../../auth/[...nextauth]';
+
 export async function PUT(request: Request) {
-    const session = await getServerSession({ req: request }, authOptions);
+    const session = await getServerSession(authOptions);
+    console.log('Session:', session);
+
 
     if (!session) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
