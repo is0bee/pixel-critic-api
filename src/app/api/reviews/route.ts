@@ -1,25 +1,8 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'aipapai';
-
-export async function GET(req: Request) {
-    const url = new URL(req.url);
-    const game_id = url.searchParams.get("game_id");
-
-    if (!game_id) {
-        return NextResponse.json({ message: 'Game ID is required' }, { status: 400 });
-    }
-
-    try {
-        const { rows } = await sql`
-            SELECT * FROM Reviews WHERE game_id = ${game_id}`;
-        return NextResponse.json(rows, { status: 200 });
-    } catch (error) {
-        return NextResponse.json({ message: 'Error fetching reviews', error }, { status: 500 });
-    }
-}
 
 export async function POST(req: Request) {
     const authHeader = req.headers.get('Authorization');
@@ -28,10 +11,10 @@ export async function POST(req: Request) {
     }
 
     const token = authHeader.split(' ')[1];
-    let user_id;
+    let user_id: string;
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
         user_id = decoded.id;
     } catch (error) {
         return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
@@ -67,11 +50,11 @@ export async function DELETE(req: Request) {
     }
 
     const token = authHeader.split(' ')[1];
-    let user_id;
+    let user_id: string;
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        user_id = decoded.id; 
+        const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+        user_id = decoded.id;
     } catch (error) {
         return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
     }
