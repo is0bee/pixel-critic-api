@@ -1,9 +1,11 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { sql } from '@vercel/postgres';
-import bcrypt from 'bcryptjs'; // Ensure to use bcryptjs for compatibility with NextAuth
+import bcrypt from 'bcryptjs';
+import { NextAuthOptions, Session, User } from 'next-auth';
+import { JWT } from 'next-auth/jwt';
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -12,7 +14,7 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const { email, password } = credentials;
+        const { email, password } = credentials as { email: string, password: string };
 
         try {
           const { rows } = await sql`SELECT * FROM Users WHERE email = ${email}`;
@@ -36,14 +38,14 @@ export const authOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT, user?: User }) {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    async session({ session, token }) {
-      session.user.id = token.id;
+    async session({ session, token }: { session: Session, token: JWT }) {
+      session.user.id = token.id as string;
       console.log(session);
       return session;
     },
