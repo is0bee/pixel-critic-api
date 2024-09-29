@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'aipapai';
 
 export async function PUT(request: Request) {
-
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -13,7 +12,7 @@ export async function PUT(request: Request) {
 
     const token = authHeader.split(' ')[1];
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload; // Type assertion
 
         const { bio, avatar } = await request.json();
 
