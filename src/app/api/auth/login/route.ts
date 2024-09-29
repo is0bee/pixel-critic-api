@@ -1,5 +1,8 @@
 import { sql } from '@vercel/postgres';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'aipapai';
 
 export async function POST(req: Request) {
   const { email, password } = await req.json();
@@ -20,8 +23,14 @@ export async function POST(req: Request) {
       return new Response(JSON.stringify({ message: 'Invalid password' }), { status: 401 });
     }
 
-    return new Response(JSON.stringify({ user: { id: user.id, username: user.username, email: user.email } }), { status: 200 });
+    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+
+    return new Response(JSON.stringify({ 
+      user: { id: user.id, username: user.username, email: user.email },
+      token
+    }), { status: 200 });
   } catch (error) {
-    return new Response(JSON.stringify({ message: 'Error logging in', error }), { status: 400 });
+    console.error('Error logging in:', error); // Log the error for debugging
+    return new Response(JSON.stringify({ message: 'Error logging in' }), { status: 500 });
   }
 }

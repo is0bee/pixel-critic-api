@@ -1,70 +1,74 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
-import { getSession } from 'next-auth/react';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
-const reviewsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-    switch (req.method) {
-        case 'GET':
-            const { game_id } = req.query;
-            try {
-                const { rows } = await sql`
-                    SELECT * FROM Reviews WHERE game_id = ${game_id}`;
-                res.status(200).json(rows);
-            } catch (error) {
-                res.status(500).json({ message: 'erro ao buscar reviews', error });
-            }
-            break;
+const JWT_SECRET = process.env.JWT_SECRET || 'aipapai';
 
-        case 'POST':
-            const session = await getSession({ req });
-            const user_id = session?.user?.id;
-
-            if (!user_id) {
-                return res.status(401).json({ message: 'User not authenticated' });
-            }
-
-            const { game, review } = req.body;
-            const { content, rating, game_id: reviewGameId } = review;
-      
-            try {
-                const gameInsert = await sql`
-                    INSERT INTO games (title, description, release_date, platform)
-                    VALUES (${game.title}, ${game.description}, ${game.release_date}, ${game.platform})
-                    ON CONFLICT (id) DO NOTHING
-                    RETURNING id`;
-                
-                const insertedGameId = gameInsert.rows[0]?.id || reviewGameId;
-
-                const reviewInsert = await sql`
-                    INSERT INTO Reviews (user_id, content, rating, game_id)
-                    VALUES (${user_id}, ${content}, ${rating}, ${insertedGameId})
-                    RETURNING *`;
-                
-                res.status(201).json(reviewInsert.rows[0]);
-            } catch (error) {
-                res.status(400).json({ message: 'erro ao criar review', error });
-            }
-            break;
-
-        case 'DELETE':
-            const { reviewId } = req.body;
-
-            try {
-                const { rowCount } = await sql`
-                    DELETE FROM Reviews WHERE id = ${reviewId}`;
-                if (rowCount === 0) {
-                    return res.status(404).json({ message: 'review nao encontrada' });
-                }
-                res.status(204).end();
-            } catch (error) {
-                res.status(400).json({ message: 'erro ao deletar review', error });
-            }
-            break;
-
-        default:
-            res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
-            res.status(405).end(`Method ${req.method} not allowed`);
+export async function POST(req: Request) {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json({ message: 'User not authenticated' }, { status: 401 });
     }
-};
 
-export default reviewsHandler;
+    const token = authHeader.split(' ')[1];
+    let user_id: string;
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+        user_id = decoded.id;
+    } catch (error) {
+        return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+    }
+
+    try {
+        const { game, review } = await req.json();
+        const { content, rating, game_id: reviewGameId } = review;
+
+        const gameInsert = await sql`
+            INSERT INTO games (title, description, release_date, platform)
+            VALUES (${game.title}, ${game.description}, ${game.release_date}, ${game.platform})
+            ON CONFLICT (id) DO NOTHING
+            RETURNING id`;
+
+        const insertedGameId = gameInsert.rows[0]?.id || reviewGameId;
+
+        const reviewInsert = await sql`
+            INSERT INTO Reviews (user_id, content, rating, game_id)
+            VALUES (${user_id}, ${content}, ${rating}, ${insertedGameId})
+            RETURNING *`;
+
+        return NextResponse.json(reviewInsert.rows[0], { status: 201 });
+    } catch (error) {
+        return NextResponse.json({ message: 'Error creating review', error }, { status: 400 });
+    }
+}
+
+export async function DELETE(req: Request) {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json({ message: 'User not authenticated' }, { status: 401 });
+    }
+
+    const token = authHeader.split(' ')[1];
+    let user_id: string;
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+        user_id = decoded.id;
+    } catch (error) {
+        return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+    }
+
+    const { reviewId } = await req.json();
+
+    try {
+        const { rowCount } = await sql`
+            DELETE FROM Reviews WHERE id = ${reviewId} AND user_id = ${user_id}`;
+        if (rowCount === 0) {
+            return NextResponse.json({ message: 'Review not found or not authorized to delete' }, { status: 404 });
+        }
+        return NextResponse.json(null, { status: 204 });
+    } catch (error) {
+        return NextResponse.json({ message: 'Error deleting review', error }, { status: 400 });
+    }
+}

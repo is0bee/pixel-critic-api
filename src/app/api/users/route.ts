@@ -1,14 +1,22 @@
-// app/api/users/route.ts
 import { NextResponse } from 'next/server';
-import { getSession } from 'next-auth/react';
 import { sql } from '@vercel/postgres';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'aipapai';
 
 const authenticate = async (req: Request) => {
-    const session = await getSession({ req });
-    if (!session) {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return null;
     }
-    return session.user;
+
+    const token = authHeader.split(' ')[1];
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        return decoded;
+    } catch (error) {
+        return null;
+    }
 };
 
 export async function GET(req: Request) {
@@ -31,12 +39,12 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: 'Usuário não autenticado' }, { status: 401 });
     }
 
-    const { username, email, bio, avatar } = await req.json();
+    const { username, email, bio, avatar, password } = await req.json();
 
     try {
         const { rows } = await sql`
-            INSERT INTO Users (username, email, bio, avatar)
-            VALUES (${username}, ${email}, ${bio}, ${avatar})
+            INSERT INTO Users (username, email, bio, avatar, password)
+            VALUES (${username}, ${email}, ${bio}, ${avatar}, ${password})
             RETURNING *`;
         return NextResponse.json(rows[0], { status: 201 });
     } catch (error) {
