@@ -1,9 +1,9 @@
-import React, {
+'use client'
+
+import {
   createContext,
-  Dispatch,
   ReactNode,
-  SetStateAction,
-  useState,
+  useState
 } from "react";
 
 import User from "@/types/user";
@@ -39,3 +39,4 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export { AuthContext, AuthProvider };
+

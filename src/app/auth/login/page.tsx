@@ -2,7 +2,7 @@
 
 import { useContext, useState } from "react";
 
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 import Logo from "@/assets/logo.png";
 
@@ -33,7 +33,9 @@ export default function LoginPage() {
 
   const [IsLoading, setIsLoading] = useState(false);
   const [Error, setError] = useState<string | null>("");
-  const { login } = useContext(AuthContext);
+  const { login, token, user } = useContext(AuthContext);
+
+  const { replace } = useRouter()
 
   async function handleSubmit(event: any) {
     setError(null);
@@ -44,11 +46,9 @@ export default function LoginPage() {
     try {
       const { user, token } = await Login(email, password);
 
-      if (token && user) {
-        login(token, user);
+      login(token, user);
 
-        redirect("/");
-      }
+      replace("/");
     } catch (e) {
       console.error(e);
     }

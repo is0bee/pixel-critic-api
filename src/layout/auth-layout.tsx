@@ -2,7 +2,7 @@
 
 import { ReactNode, useContext } from "react";
 
-import { AuthContext, AuthProvider } from "@/context/auth-context";
+import { AuthContext } from "@/context/auth-context";
 import { useEffect } from "react";
 
 import { redirect } from "next/navigation";
