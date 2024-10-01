@@ -1,9 +1,6 @@
 import { default as Image } from "next/image"
-import { useEffect, useState } from "react"
 
-import useGames from "@/hooks/use-games"
 
-import Game from "@/types/game"
 import { UserReview } from "@/types/review"
 
 import { Star } from "lucide-react"
@@ -13,43 +10,28 @@ type Props = {
 }
 
 export default function ReviewCard({ review }: Props) {
-  const { game_id, rating, content } = review
-  const { games, isLoading } = useGames()
+  const { rating, content, title, background_image } = review
 
-  const [game, setGame] = useState<Game | null>(null)
+  return (
+    <div className="flex flex-col items-center justify-center gap-5 border-b sm:border-b-0 sm:flex-row sm:items-start sm:justify-start">
+      <Image
+        width={200}
+        height={130}
+        className="w-[130px] h-[200px] sm:w-[160px] sm:h-[230px] object-cover"
+        src={background_image}
+        alt=""
+      />
 
-  useEffect(() => {
-    const uniqueGame = games?.find((game) => game.id === game_id)
-    if (uniqueGame) {
-      console.log({ uniqueGame })
-      setGame(uniqueGame)
-    }
-  }, [game_id, games])
-
-  if (isLoading) <p>Buscando review...</p>
-
-  if (game) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-5 border-b sm:border-b-0 sm:flex-row sm:items-start sm:justify-start">
-        <Image
-          width={200}
-          height={130}
-          className="w-[130px] h-[200px] sm:w-[160px] sm:h-[230px] object-cover"
-          src={game?.background_image}
-          alt=""
-        />
-
-        {/* card info */}
-        <div className="flex flex-col items-center justify-center gap-4 py-5 size-full sm:items-start sm:justify-start">
-          <h1 className="text-2xl font-bold">{game.title}</h1>
-          <div className="flex items-start gap-2 jusitfy-center">
-            {Array.from({ length: rating }).map((_, index) => {
-              return <Star fill="#facc15" key={index} className="w-6 h-6 text-yellow-400" />
-            })}
-          </div>
-          <p className="text-base text-center sm:text-start">&quot;{content}&quot;</p>
+      {/* card info */}
+      <div className="flex flex-col items-center justify-center gap-4 py-5 size-full sm:items-start sm:justify-start">
+        <h1 className="text-2xl font-bold">{title}</h1>
+        <div className="flex items-start gap-2 jusitfy-center">
+          {Array.from({ length: rating }).map((_, index) => {
+            return <Star fill="#facc15" key={index} className="w-6 h-6 text-yellow-400" />
+          })}
         </div>
+        <p className="text-base text-center sm:text-start">&quot;{content}&quot;</p>
       </div>
-    )
-  }
+    </div>
+  )
 }

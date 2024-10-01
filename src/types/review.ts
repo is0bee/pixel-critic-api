@@ -5,6 +5,8 @@ export type Review = {
 
 export type UserReview = {
   id: number,
+  title: string
+  background_image: string
   user_id: number,
   game_id: number,
   content: string,
