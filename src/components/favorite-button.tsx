@@ -35,7 +35,7 @@ export default function FavoriteButton({ game_id, user_id, title }: Props) {
       onClick={handleFavorite}
     >
       {!isLoading && <Star data-isfavorite={isFavorite} className="w-4 h-4 mr-2 data-[isfavorite=true]:bg-yellow-500 text-yellow-500" />}
-      {isLoading && <Loader2 className="w-4 h-4 mr-2" />}
+      {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
       {isFavorite ? <span>Favoritado</span> : <span>Favoritar</span>}
     </Button>
   )

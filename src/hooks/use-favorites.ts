@@ -21,13 +21,14 @@ export default function useFavorites(user_id: number) {
         throw new Error(data)
       }
 
+      setIsLoading(false)
+
       return data
     }
 
     fetchData()
       .then((data) => {
         setFavorites(data)
-        console.log('favorites data', { data })
       })
       .catch((e) => setError(e))
   }, [user_id])
