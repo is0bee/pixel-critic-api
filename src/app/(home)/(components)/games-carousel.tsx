@@ -1,4 +1,6 @@
+'use client'
 
+import getGames from "@/actions/get-games"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import {
@@ -13,6 +15,7 @@ import {
 import Autoplay from "embla-carousel-autoplay"
 import { Pencil, Star } from "lucide-react"
 import Image from "next/image"
+import { useEffect } from "react"
 
 const mockdata = [
   {
@@ -48,6 +51,19 @@ const mockdata = [
 ]
 
 export default function GamesCarousel() {
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getGames()
+        console.log(data)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    fetchData()
+  }, [])
 
 
   return (
