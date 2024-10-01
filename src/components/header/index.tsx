@@ -16,6 +16,8 @@ import { CircleUserRound } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useContext } from "react"
+import { Button } from "../ui/button"
+import { Separator } from "../ui/separator"
 
 export default function Header() {
   const [searchText, setSearchText] = useState('')
@@ -23,14 +25,6 @@ export default function Header() {
   const { token, user } = useContext(AuthContext)
 
   const { replace } = useRouter()
-
-  function goToLogin() {
-    replace('/auth/login')
-  }
-
-  function goToProfile() {
-    replace('/conta/perfil')
-  }
 
   return (
     <header className="grid col-span-1 row-span-1 place-items-center">
@@ -60,12 +54,17 @@ export default function Header() {
 
           {/* logged content */}
           {token && <div
-            onClick={goToProfile}
-            className="flex items-center justify-center gap-2 cursor-pointer"
+            className="flex items-center justify-center h-full gap-3"
             title="Perfil"
           >
-            <span>{user?.username ?? 'Usuário'}</span>
-            <CircleUserRound className="w-10 h-10" />
+            <span className="text-xl font-semibold capitalize">{user?.username ?? 'Usuário'}</span>
+            <Separator orientation="vertical" className="w-px h-10" />
+            <Button variant={'outline'} asChild>
+              <Link href={'/conta/perfil'}>
+                <CircleUserRound className="w-6 h-6 mr-2" />
+                Meu perfil
+              </Link>
+            </Button>
           </div>
           }
         </div>

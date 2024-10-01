@@ -13,7 +13,6 @@ export default function useGames() {
 
       try {
         const data = await getGames()
-        console.log(data)
         setGames(data)
       } catch (e) {
         setError(e)
