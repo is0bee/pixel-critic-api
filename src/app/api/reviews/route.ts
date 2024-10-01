@@ -47,12 +47,12 @@ export async function POST(req: Request) {
     }
 
     try {
-        const { game, review } = await req.json();
+        const { game, review, background_image } = await req.json();
         const { content, rating, game_id: reviewGameId } = review;
 
         const gameInsert = await sql`
             INSERT INTO Games (title, description, release_date, platform, background_image)
-            VALUES (${game.title}, ${game.description}, ${game.release_date}, ${game.platform}, ${game.background_image})
+            VALUES (${game.title}, ${game.description}, ${game.release_date}, ${game.platform}, ${background_image})
             ON CONFLICT (id) DO NOTHING
             RETURNING id`;
 
