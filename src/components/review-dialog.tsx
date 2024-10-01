@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -27,6 +28,7 @@ type Props = {
 export function ReviewDialog({ game }: Props) {
   const [comment, setComment] = useState<string>("")
   const [rating, setRating] = useState<number>(1)
+  const [message, setMessage] = useState<string>("")
 
   const { token } = useContext(AuthContext)
   const { sendReview, isLoading, error } = useSendReview()
@@ -41,8 +43,10 @@ export function ReviewDialog({ game }: Props) {
 
     try {
       const data = await sendReview(game, review, token)
+      setMessage('Review adicionado com sucesso')
     } catch (e) {
       console.error(error)
+      setMessage(JSON.stringify(error, null, 2))
     }
   }
 
@@ -96,8 +100,13 @@ export function ReviewDialog({ game }: Props) {
               />
             </div>
           </div>
-          {error && <p className="my-4 font-semibold text-red-400">{JSON.stringify(error, null, 2)}</p>}
-          <DialogFooter>
+          {error && message && <p className="my-4 font-semibold text-red-400">{JSON.stringify(error, null, 2)}</p>}
+
+          {message && !error && <p className="my-4 font-semibold text-emerald-500">{message}</p>}
+          <DialogFooter className="flex flex-col items-center justify-center sm:justify-between sm:flex-row">
+            <DialogClose className="px-4 py-2 transition border rounded border-border bg-background hover:bg-neutral hover:border-neutral hover:text-neutral-foreground">
+              Cancelar
+            </DialogClose>
             <Button type="submit" disabled={isLoading || !comment || !rating}>
               {!isLoading && <Send className="w-4 h-4 mr-2" />}
               {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
