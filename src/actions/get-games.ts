@@ -4,9 +4,11 @@ const API_KEY = "0179ef5a00f54f35be69b138abf3ea30"
 
 
 
-export default async function getGames(): Promise<Game[]> {
+export default async function getGames(gameID?: number): Promise<Game[]> {
   const queryParams = new URLSearchParams({ key: `${API_KEY}` })
-  const response = await fetch(`${process.env.NEXT_PUBLIC_GAMES_API_URL}/games?` + queryParams, {
+  const searchURL = gameID ? `/${gameID}` : ''
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_GAMES_API_URL}/games${searchURL}?` + queryParams, {
     method: 'GET'
   })
 
