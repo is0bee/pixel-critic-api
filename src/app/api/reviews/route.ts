@@ -66,7 +66,6 @@ export async function POST(req: Request) {
 
         return NextResponse.json(reviewInsert.rows[0], { status: 201 });
     } catch (error) {
-        console.log(error)
         return NextResponse.json({ message: 'Error creating review', error }, { status: 400 });
     }
 }
