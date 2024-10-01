@@ -4,6 +4,32 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'aipapai';
 
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const gameId = searchParams.get('game_id');
+    const userId = searchParams.get('user_id');
+
+    if (gameId) {
+        try {
+            const reviews = await sql`
+                SELECT * FROM Reviews WHERE game_id = ${gameId}`;
+            return NextResponse.json(reviews.rows, { status: 200 });
+        } catch (error) {
+            return NextResponse.json({ message: 'Error fetching reviews', error }, { status: 400 });
+        }
+    } else if (userId) {
+        try {
+            const reviews = await sql`
+                SELECT * FROM Reviews WHERE user_id = ${userId}`;
+            return NextResponse.json(reviews.rows, { status: 200 });
+        } catch (error) {
+            return NextResponse.json({ message: 'Error fetching user reviews', error }, { status: 400 });
+        }
+    }
+
+    return NextResponse.json({ message: 'Game ID or User ID required' }, { status: 400 });
+}
+
 export async function POST(req: Request) {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
