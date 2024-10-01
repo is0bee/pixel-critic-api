@@ -23,7 +23,7 @@ export default function AccountPageLayout({ children }: { children: ReactNode })
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen gap-2 px-6 mt-4 min-w-screen sm:px-screen sm:mt-20">
+    <div className="flex flex-col items-center min-w-full min-h-screen gap-2 px-6 mt-4 sm:px-screen sm:mt-20">
       <header className="flex items-center justify-start w-full gap-3">
         <CircleUser className="w-8 h-8" />
         <span className="text-xl">{user?.username}</span>
