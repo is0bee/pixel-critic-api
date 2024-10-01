@@ -1,7 +1,7 @@
 'use client'
 
+import FavoriteButton from "@/components/favorite-button"
 import { ReviewDialog } from "@/components/review-dialog"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import {
   Carousel,
@@ -10,28 +10,24 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { AuthContext } from "@/context/auth-context"
 import useGames from "@/hooks/use-games"
-import Review from "@/types/review"
 
 // plugins
 import Autoplay from "embla-carousel-autoplay"
-import { Star } from "lucide-react"
 import Image from "next/image"
+import { useContext } from "react"
 
 
 export default function GamesCarousel() {
   const { games, error, isLoading } = useGames()
-
-  const mockReview: Review = {
-    content: "Jogo pika",
-    rating: 5
-  }
+  const { user } = useContext(AuthContext)
 
   if (isLoading) return <p>Carregando jogos...</p>
 
   if (error) return <p>{JSON.stringify(error, null, 2)}</p>
 
-  if (games) return (
+  if (games && user) return (
     <Carousel
       opts={{
         align: "center",
@@ -63,10 +59,7 @@ export default function GamesCarousel() {
                 <CardFooter className="flex flex-col items-center justify-center gap-2">
                   <span className="font-bold">{game.title}</span>
                   <div className="flex flex-col items-center justify-center w-full space-y-2">
-                    <Button variant={'outline'} className="w-full">
-                      <Star className="w-4 h-4 mr-2 text-yellow-500" />
-                      Favoritar
-                    </Button>
+                    <FavoriteButton game_id={game.id} user_id={user?.id} title={game.title} />
 
                     <ReviewDialog game={game} />
                   </div>
