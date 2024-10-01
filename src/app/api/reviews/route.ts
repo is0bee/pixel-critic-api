@@ -51,8 +51,8 @@ export async function POST(req: Request) {
         const { content, rating, game_id: reviewGameId } = review;
 
         const gameInsert = await sql`
-            INSERT INTO games (title, description, release_date, platform)
-            VALUES (${game.title}, ${game.description}, ${game.release_date}, ${game.platform})
+            INSERT INTO Games (title, description, release_date, platform, background_image)
+            VALUES (${game.title}, ${game.description}, ${game.release_date}, ${game.platform}, ${game.background_image})
             ON CONFLICT (id) DO NOTHING
             RETURNING id`;
 
