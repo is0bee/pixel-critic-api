@@ -12,7 +12,11 @@ export async function GET(req: Request) {
     if (gameId) {
         try {
             const reviews = await sql`
-                SELECT * FROM Reviews WHERE game_id = ${gameId}`;
+                SELECT Reviews.*, Games.title, Games.background_image
+                FROM Reviews
+                JOIN Games ON Reviews.game_id = Games.id
+                WHERE Reviews.game_id = ${gameId}`;
+            
             return NextResponse.json(reviews.rows, { status: 200 });
         } catch (error) {
             return NextResponse.json({ message: 'Error fetching reviews', error }, { status: 400 });
@@ -20,7 +24,11 @@ export async function GET(req: Request) {
     } else if (userId) {
         try {
             const reviews = await sql`
-                SELECT * FROM Reviews WHERE user_id = ${userId}`;
+                SELECT Reviews.*, Games.title, Games.background_image
+                FROM Reviews
+                JOIN Games ON Reviews.game_id = Games.id
+                WHERE Reviews.user_id = ${userId}`;
+            
             return NextResponse.json(reviews.rows, { status: 200 });
         } catch (error) {
             return NextResponse.json({ message: 'Error fetching user reviews', error }, { status: 400 });
@@ -29,6 +37,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ message: 'Game ID or User ID required' }, { status: 400 });
 }
+
 
 export async function POST(req: Request) {
     const authHeader = req.headers.get('Authorization');
