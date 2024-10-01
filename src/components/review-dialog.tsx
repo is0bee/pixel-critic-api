@@ -31,6 +31,7 @@ export function ReviewDialog({ game }: Props) {
   const { token } = useContext(AuthContext)
   const { sendReview, isLoading, error } = useSendReview()
 
+
   async function handleSubmit(e: any) {
     e.preventDefault();
     const review = {
@@ -40,7 +41,6 @@ export function ReviewDialog({ game }: Props) {
 
     try {
       const data = await sendReview(game, review, token)
-      console.log(data)
     } catch (e) {
       console.error(error)
     }

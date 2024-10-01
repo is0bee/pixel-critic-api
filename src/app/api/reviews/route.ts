@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { NextResponse } from 'next/server';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'aipapai';
 
@@ -50,6 +50,7 @@ export async function POST(req: Request) {
         const { game, review, background_image } = await req.json();
         const { content, rating, game_id: reviewGameId } = review;
 
+
         const gameInsert = await sql`
             INSERT INTO Games (title, description, release_date, platform, background_image)
             VALUES (${game.title}, ${game.description}, ${game.release_date}, ${game.platform}, ${background_image})
@@ -65,6 +66,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json(reviewInsert.rows[0], { status: 201 });
     } catch (error) {
+        console.log(error)
         return NextResponse.json({ message: 'Error creating review', error }, { status: 400 });
     }
 }
