@@ -1,11 +1,10 @@
 "use client";
 
-import { ReactNode, useContext } from "react";
+import { ReactNode, useContext, useEffect } from "react";
 
 import { AuthContext } from "@/context/auth-context";
-import { useEffect } from "react";
-
 import { redirect } from "next/navigation";
+
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   const { token } = useContext(AuthContext);
