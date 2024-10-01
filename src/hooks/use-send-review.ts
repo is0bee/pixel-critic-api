@@ -3,16 +3,29 @@ import { useCallback, useState } from "react";
 import Game from "@/types/game";
 import Review from "@/types/review";
 
-export default function useSendReview(game: Game, review: Review) {
+export default function useSendReview() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<unknown | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const sendReview = useCallback(async () => {
+  const sendReview = useCallback(async (game: Game, review: Review, token: string) => {
     setIsLoading(true)
+
+    // modifying data
+    const modifiedGame: Omit<Game, 'id'> = { ...game }
+    const modifiedReview = {
+      ...review,
+      game_id: game.id
+    }
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews`, {
       method: 'POST',
-      body: JSON.stringify({ game, review })
+      headers,
+      body: JSON.stringify({ modifiedGame, modifiedReview })
     })
 
     const data = await response.json()
@@ -24,7 +37,7 @@ export default function useSendReview(game: Game, review: Review) {
     setIsLoading(false)
 
     return data
-  }, [game, review])
+  }, [])
 
   return { isLoading, error, sendReview }
 }

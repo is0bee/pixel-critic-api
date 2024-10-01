@@ -1,6 +1,6 @@
 'use client'
 
-import ReviewButton from "@/components/review-button"
+import { ReviewDialog } from "@/components/review-dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import {
@@ -68,7 +68,7 @@ export default function GamesCarousel() {
                       Favoritar
                     </Button>
 
-                    <ReviewButton game={game} review={mockReview} />
+                    <ReviewDialog game={game} />
                   </div>
                 </CardFooter>
               </Card>
