@@ -1,6 +1,5 @@
 'use client'
 
-import getGames from "@/actions/get-games"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import {
@@ -10,12 +9,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import useGames from "@/hooks/use-games"
 
 // plugins
 import Autoplay from "embla-carousel-autoplay"
 import { Pencil, Star } from "lucide-react"
 import Image from "next/image"
-import { useEffect } from "react"
 
 const mockdata = [
   {
@@ -51,22 +50,13 @@ const mockdata = [
 ]
 
 export default function GamesCarousel() {
+  const { games, error, isLoading } = useGames()
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await getGames()
-        console.log(data)
-      } catch (e) {
-        console.error(e)
-      }
-    }
+  if (isLoading) return <p>Carregando jogos...</p>
 
-    fetchData()
-  }, [])
+  if (error) return <p>{JSON.stringify(error, null, 2)}</p>
 
-
-  return (
+  if (games) return (
     <Carousel
       opts={{
         align: "center",
@@ -79,7 +69,7 @@ export default function GamesCarousel() {
       className="w-2/3 md:w-full"
     >
       <CarouselContent className="flex items-center justify-center">
-        {mockdata.map((game) => (
+        {games.map((game) => (
           <CarouselItem
             key={game.id}
             className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/6"
@@ -91,12 +81,12 @@ export default function GamesCarousel() {
                     width={200}
                     height={200}
                     className="h-[250px] object-cover w-full"
-                    src={game.img}
+                    src={game.background_image}
                     alt=""
                   />
                 </CardContent>
-                <CardFooter className="flex flex-col items-start justify-center gap-2">
-                  <span className="font-bold">{game.name}</span>
+                <CardFooter className="flex flex-col items-center justify-center gap-2">
+                  <span className="font-bold">{game.title}</span>
                   <div className="flex flex-col items-center justify-center w-full space-y-2">
                     <Button variant={'outline'} className="w-full">
                       <Star className="w-4 h-4 mr-2 text-yellow-500" />
