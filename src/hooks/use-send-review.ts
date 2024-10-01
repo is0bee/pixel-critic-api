@@ -25,7 +25,7 @@ export default function useSendReview() {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ modifiedGame, modifiedReview })
+      body: JSON.stringify({ modifiedGame, modifiedReview, background_image: game.background_image })
     })
 
     const data = await response.json()
