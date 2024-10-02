@@ -2,7 +2,6 @@
 
 import { Mail, User } from "lucide-react";
 
-import { Button } from '@/components/ui/button';
 
 import { Separator } from '@/components/ui/separator';
 import { AuthContext } from "@/context/auth-context";
@@ -35,9 +34,6 @@ export default function ProfilePage() {
       </div>
       <Separator />
 
-      <Button className="self-center sm:self-start">
-        Alterar senha
-      </Button>
     </div>
   )
 }
