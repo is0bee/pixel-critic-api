@@ -1,6 +1,7 @@
 import Game from "@/types/game";
 import { useEffect, useState } from "react";
 
+
 export default function useFavorites(user_id: number) {
   const [favorites, setFavorites] = useState<Game[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -12,7 +13,10 @@ export default function useFavorites(user_id: number) {
 
       const queryParams = new URLSearchParams({ user_id: user_id.toString() })
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/favorites?` + queryParams, {
-        method: 'GET'
+        method: 'GET',
+        next: {
+          revalidate: 60,
+        }
       })
 
       const data = await response.json()

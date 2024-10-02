@@ -4,6 +4,7 @@ import { Separator } from "./ui/separator";
 
 // assets
 import IFCEImg from "@/assets/footer/ifce.png";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -18,11 +19,11 @@ export default function Footer() {
       <div className="flex flex-col items-center justify-center gap-2 basis-1/5">
         <h1 className="text-lg font-bold text-primary-foreground">Links úteis</h1>
         <nav className="flex flex-col items-center justify-center">
-          <a className="transition hover:text-primary" href="/">Início</a>
-          <a className="transition hover:text-primary" href="/conta/perfil">Perfil</a>
-          <a className="transition hover:text-primary" href="/conta/meus-jogos">Meus Jogos</a>
-          <a className="transition hover:text-primary" href="/conta/reviews">Reviews</a>
-          <a className="transition hover:text-primary" href="/conta/amigos">Amigos</a>
+          <Link className="transition hover:text-primary" href="/">Início</Link>
+          <Link className="transition hover:text-primary" href="/conta/perfil">Perfil</Link>
+          <Link className="transition hover:text-primary" href="/conta/meus-jogos">Meus Jogos</Link>
+          <Link className="transition hover:text-primary" href="/conta/reviews">Reviews</Link>
+          <Link className="transition hover:text-primary" href="/conta/amigos">Amigos</Link>
         </nav>
       </div>
 
