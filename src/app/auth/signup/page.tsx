@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 
 import Logo from "@/assets/logo.png";
 
@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import Image from "next/image";
+import Link from "next/link";
 
 export default function SignupPage() {
   const [username, setUsername] = useState<string>("");
@@ -31,7 +32,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>("");
 
-  async function handleSubmit(event: any) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     setIsLoading(true);
     setMessage(null);
 
@@ -120,10 +121,14 @@ export default function SignupPage() {
             </Button>
             <Button
               className="w-full sm:w-1/2"
-              variant={"ghost"}
-              onClick={goToLogin}
+              variant={'ghost'}
+              asChild
             >
-              Já possuo uma conta
+              <Link
+                href={'/auth/login'}
+              >
+                Já possuo uma conta
+              </Link>
             </Button>
           </CardFooter>
         </form>

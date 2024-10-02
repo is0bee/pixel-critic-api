@@ -17,7 +17,7 @@ import Game from "@/types/game"
 import { AuthContext } from "@/context/auth-context"
 import useSendReview from "@/hooks/use-send-review"
 import { Loader2, Pencil, Send } from "lucide-react"
-import { useContext, useState } from "react"
+import { FormEvent, useContext, useState } from "react"
 import { Separator } from "./ui/separator"
 import { Textarea } from "./ui/textarea"
 
@@ -34,7 +34,7 @@ export function ReviewDialog({ game }: Props) {
   const { sendReview, isLoading, error } = useSendReview()
 
 
-  async function handleSubmit(e: any) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const review = {
       content: comment,

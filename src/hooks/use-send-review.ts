@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 
 import Game from "@/types/game";
-import Review from "@/types/review";
+import { Review } from "@/types/review";
 
 export default function useSendReview() {
   const [isLoading, setIsLoading] = useState<boolean>(false)

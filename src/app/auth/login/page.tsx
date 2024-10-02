@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { FormEvent, useContext, useState } from "react";
 
 import { redirect, useRouter } from "next/navigation";
 
@@ -26,6 +26,7 @@ import { Label } from "@/components/ui/label";
 
 // context
 import { AuthContext } from "@/context/auth-context";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>("");
@@ -37,7 +38,7 @@ export default function LoginPage() {
 
   const { replace } = useRouter()
 
-  async function handleSubmit(event: any) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     setError(null);
 
     setIsLoading(true);
@@ -130,12 +131,12 @@ export default function LoginPage() {
               Entrar
             </Button>
             <div className="flex items-center justify-center w-full sm:w-1/2">
-              <a
-                onClick={goToRegistry}
+              <Link
+                href={'/auth/signup'}
                 className="transition cursor-pointer hover:text-primary"
               >
                 Não tem conta?
-              </a>
+              </Link>
             </div>
           </CardFooter>
         </form>
