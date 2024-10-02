@@ -34,9 +34,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: 'User ID and Game ID are required' }, { status: 400 });
     }
 
-    // Fetch the game data from RAWG API
-    const RAWG_API_KEY = process.env.RAWG_API_KEY;
-
     let gameData;
     try {
         const response = await fetch(`https://api.rawg.io/api/games/${gameId}?key=${RAWG_API_KEY}`);
@@ -48,7 +45,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: 'Error fetching game data', error }, { status: 500 });
     }
 
-    // Ensure that the required fields are present
     const { id: apiGameId, name: title, description, background_image, released: release_date, platforms } = gameData; // Adjust based on the actual API response structure
 
     if (!apiGameId || !title || !description) {
@@ -56,14 +52,13 @@ export async function POST(req: Request) {
     }
 
     try {
-        // Insert game data into the Games table with API ID
+
         const { rows } = await sql`
             INSERT INTO Games (id, title, description, release_date, platform, background_image)
             VALUES (${apiGameId}, ${title}, ${description}, ${release_date}, ${platforms}, ${background_image})
             ON CONFLICT (id) DO NOTHING
             RETURNING *`;
 
-        // Now insert into Favorites
         const favoriteInsert = await sql`
             INSERT INTO Favorites (user_id, game_id)
             VALUES (${userId}, ${apiGameId})
@@ -75,8 +70,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: 'Error adding to favorites', error }, { status: 400 });
     }
 }
-
-
 
 export async function DELETE(req: Request) {
     const { userId, gameId } = await req.json();
